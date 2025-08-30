@@ -3,6 +3,7 @@ class Product {
   final String name;
   final String description;
   final double price;
+  final String style;
   final String imageUrl;
 
   Product({
@@ -10,6 +11,7 @@ class Product {
     required this.name,
     required this.description,
     required this.price,
+    required this.style,
     required this.imageUrl,
   });
 
@@ -20,6 +22,7 @@ class Product {
       name: data['name'] ?? '',
       description: data['description'] ?? '',
       price: (data['price'] ?? 0).toDouble(),
+      style: data['style'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
     );
   }
@@ -30,6 +33,7 @@ class Product {
       'name': name,
       'description': description,
       'price': price,
+      'style': style,
       'imageUrl': imageUrl,
     };
   }
