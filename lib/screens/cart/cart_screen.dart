@@ -1,3 +1,4 @@
+import 'package:app_flutter/screens/product/product_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -65,6 +66,7 @@ class CartScreen extends StatelessWidget {
                           icon: Icon(Icons.delete),
                           color: Colors.red,
                         ),
+                        onTap: () {},
                       ),
                     );
                   },

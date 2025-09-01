@@ -14,6 +14,9 @@ import 'package:app_flutter/screens/product/product_list_screen.dart';
 import 'package:app_flutter/screens/cart/cart_screen.dart';
 import 'package:app_flutter/models/product_model.dart';
 import 'package:app_flutter/screens/product/product_card.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:app_flutter/screens/product/search_Screen.dart';
+import 'package:app_flutter/config/update_data.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -47,6 +50,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _onTapAppBar(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth
@@ -63,16 +72,9 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return ProfileScreen();
-                  },
-                ),
-              );
+              _onTapAppBar(3);
             },
-            icon: const Icon(Icons.shopping_cart, color: Colors.white),
+            icon: const Icon(Icons.person, color: Colors.white),
             tooltip: 'Tài khoản',
           ),
           IconButton(
@@ -86,11 +88,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             },
-            icon: const Icon(Icons.person, color: Colors.white),
+            icon: const Icon(Icons.shopping_cart, color: Colors.white),
             tooltip: 'Giỏ hàng',
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              showSearch(context: context, delegate: SearchScreen());
+            },
             icon: const Icon(Icons.search, color: Colors.white),
             tooltip: 'Tìm kiếm',
           ),
@@ -158,17 +162,19 @@ class HomePageContent extends StatelessWidget {
             final productsOfStyle = groupProducts[type]!;
             final firstStyleProducts = productsOfStyle.first;
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                   ),
-                ),
-                ProductCard(product: firstStyleProducts),
-              ],
+                  ProductCard(product: firstStyleProducts),
+                ],
+              ),
             );
           },
         );
