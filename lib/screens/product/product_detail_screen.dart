@@ -16,15 +16,10 @@ class ProductDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text(
-          product.name,
-          style: TextStyle(
-            color: Colors.white,
-            backgroundColor: Colors.deepPurple,
-          ),
-        ),
+        title: Text(product.name, style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color.fromARGB(255, 1, 20, 49),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
         children: [

@@ -1,4 +1,3 @@
-import 'package:app_flutter/screens/product/product_detail_screen.dart';
 import 'package:app_flutter/screens/product/product_list_screen.dart';
 import 'package:app_flutter/services/product_services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,17 +5,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:app_flutter/services/auth_services.dart';
-import 'package:app_flutter/models/user_model.dart';
-import 'package:app_flutter/screens/auth/auth_screen.dart';
 import 'package:app_flutter/screens/order/order_history_screen.dart';
 import 'package:app_flutter/screens/profile/profile_screen.dart';
-import 'package:app_flutter/screens/product/product_list_screen.dart';
 import 'package:app_flutter/screens/cart/cart_screen.dart';
 import 'package:app_flutter/models/product_model.dart';
 import 'package:app_flutter/screens/product/product_card.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:app_flutter/screens/product/search_Screen.dart';
-import 'package:app_flutter/config/update_data.dart';
+import 'package:app_flutter/core/widgets/app_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -63,12 +58,12 @@ class _HomeScreenState extends State<HomeScreen> {
         .currentUser; // truy cập vào firebaseAuht lấy thông tin người dùng hiện tại
     final authServices = AuthServices();
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _appBarTitles[_selectedIndex],
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      appBar: CustomAppBar(
+        title: _appBarTitles[_selectedIndex],
+        titleTextStyle: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
         ),
-        backgroundColor: const Color.fromARGB(255, 1, 20, 49),
         actions: [
           IconButton(
             onPressed: () {

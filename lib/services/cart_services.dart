@@ -59,8 +59,35 @@ class CartServices {
         .delete();
   }
 
-  // xóa tất cả sản phẩm trong giỏ
+  // lấy đơn hàng theo id từ giỏ hàng
+  Future<Map<String, dynamic>?> getItemProductCart(
+    String productId,
+    String userId,
+  ) async {
+    final data = await _db
+        .collection('users')
+        .doc(userId)
+        .collection('cart')
+        .doc(productId)
+        .get();
+    return data.data();
+  }
 
+  // cập nhật số lượng sản phẩn
+  Future<Map<String, dynamic>?> updatedQuantityProduct(
+    String productId,
+    String userId,
+    int newQuantity,
+  ) async {
+    await _db
+        .collection('users')
+        .doc(userId)
+        .collection('cart')
+        .doc(productId)
+        .update({'quantity': newQuantity});
+  }
+
+  // xóa tất cả sản phẩm trong giỏ
   Future<void> clearCart(String userId) async {
     final cartSnapshot = await _db
         .collection('users')

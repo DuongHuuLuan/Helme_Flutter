@@ -1,24 +1,104 @@
-import 'package:app_flutter/screens/product/product_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:app_flutter/services/cart_services.dart';
 import 'package:app_flutter/services/order_services.dart';
+import 'cart_detail_screen.dart';
+import 'package:app_flutter/core/widgets/app_bar.dart';
+import 'cart_item.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
+  const CartScreen({super.key});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
   final cartServices = CartServices();
   final userId = FirebaseAuth.instance.currentUser!.uid;
   final orderServices = OrderServices();
-  CartScreen({super.key});
+
+  final Set<String> _selectedItems = {};
+  bool _selectAll = false;
+
+  void _onItemToggled(String itemId, bool? isSelected) {
+    setState(() {
+      if (isSelected == true) {
+        _selectedItems.add(itemId);
+      } else {
+        _selectedItems.remove(itemId);
+      }
+      _selectAll = _selectedItems.length == cartServices.getCart(userId).length;
+    });
+  }
+
+  void _onSelectAllToggled(
+    bool? isSelected,
+    List<Map<String, dynamic>> cartItems,
+  ) {
+    setState(() {
+      _selectAll = isSelected!;
+      if (_selectAll) {
+        _selectedItems.clear();
+        for (var item in cartItems) {
+          _selectedItems.add(item['id']);
+        }
+      } else {
+        _selectedItems.clear();
+      }
+    });
+  }
+
+  void _onPayment(List<Map<String, dynamic>> cartItems) async {
+    final selectedProducts = cartItems
+        .where((item) => _selectedItems.contains(item['id']))
+        .toList();
+    if (selectedProducts.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vui lòng chọn ít nhất 1 sản phẩm để thanh toán'),
+        ),
+      );
+      return;
+    }
+
+    final total = selectedProducts.fold<double>(0, (sum, item) {
+      return sum + (item['price'] * item['quantity']);
+    });
+
+    try {
+      await orderServices.createOrder(userId, selectedProducts, total);
+      for (var item in selectedProducts) {
+        await cartServices.deleteFormCart(userId, item['id']);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: const Text('Thanh toán thành công sản phẩm được chọn'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi khi thanh toán'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     print('ID người dùng $userId');
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Giỏ hàng",
-          style: TextStyle(fontWeight: FontWeight.bold),
+      appBar: CustomAppBar(
+        title: 'Giỏ hàng',
+        titleTextStyle: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
         ),
       ),
 
@@ -44,69 +124,83 @@ class CartScreen extends StatelessWidget {
                 child: ListView.separated(
                   itemBuilder: (context, index) {
                     final item = cartItems[index];
-                    return Card(
-                      child: ListTile(
-                        leading:
-                            item['imageUrl'] != null &&
-                                item['imageUrl'].isNotEmpty
-                            ? CachedNetworkImage(
-                                imageUrl: item['imageUrl'],
-                                width: 50,
-                                fit: BoxFit.cover,
-                              )
-                            : const Icon(Icons.add_shopping_cart),
-                        title: Text(item['name']),
-                        subtitle: Text(
-                          '${item['price']} VND x ${item['quantity']}',
-                        ),
-                        trailing: IconButton(
-                          onPressed: () {
-                            cartServices.deleteFormCart(userId, item['id']);
-                          },
-                          icon: Icon(Icons.delete),
-                          color: Colors.red,
-                        ),
-                        onTap: () {},
-                      ),
+                    final isSelected = _selectedItems.contains(item['id']);
+                    return CartItem(
+                      item: item,
+                      userId: userId,
+                      isSelected: isSelected,
+                      cartServices: cartServices,
+                      onChanged: (bool? value) {
+                        return _onItemToggled(item['id'], value);
+                      },
                     );
                   },
                   separatorBuilder: (context, index) => const Divider(),
                   itemCount: cartItems.length,
                 ),
               ),
+
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(),
-                child: Column(
-                  children: [
-                    Text('Tổng tiền: ${total} VNĐ'),
-
-                    ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          await orderServices.createOrder(
-                            userId,
-                            cartItems,
-                            total,
-                          );
-                          await cartServices.clearCart(userId);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Thanh toán thành công'),
-                            ),
-                          );
-                        } catch (e) {
-                          ScaffoldMessenger.of(
-                            context,
-                          ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
-                        }
-                      },
-                      child: const Text('Xác nhận thanh toán'),
-                    ),
-                  ],
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    _onPayment(cartItems);
+                  },
+                  icon: Icon(Icons.payment, color: Colors.white),
+                  label: Text(
+                    'Thanh toán ${_selectedItems.length} Sản phẩm',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                  ),
                 ),
               ),
+              // Container(
+              //   padding: const EdgeInsets.all(16),
+              //   decoration: BoxDecoration(),
+              //   child: Column(
+              //     children: [
+              //       Text(
+              //         'Tổng tiền: ${total} VNĐ',
+              //         style: TextStyle(
+              //           fontWeight: FontWeight.bold,
+              //           fontSize: 18,
+              //         ),
+              //       ),
+
+              //       ElevatedButton(
+              //         onPressed: () async {
+              //           try {
+              //             await orderServices.createOrder(
+              //               userId,
+              //               cartItems,
+              //               total,
+              //             );
+              //             await cartServices.clearCart(userId);
+
+              //             ScaffoldMessenger.of(context).showSnackBar(
+              //               const SnackBar(
+              //                 content: Text('Thanh toán thành công'),
+              //               ),
+              //             );
+              //           } catch (e) {
+              //             ScaffoldMessenger.of(
+              //               context,
+              //             ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+              //           }
+              //         },
+              //         child: const Text(
+              //           'Thanh toán tất cả',
+              //           style: TextStyle(
+              //             fontSize: 16,
+              //             fontWeight: FontWeight.bold,
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           );
         },
