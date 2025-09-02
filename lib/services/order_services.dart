@@ -7,14 +7,16 @@ class OrderServices {
   Future<void> createOrder(
     String userId,
     List<Map<String, dynamic>> items,
-    double total,
-  ) async {
+    double total, {
+    Map<String, dynamic>? customerInfo,
+  }) async {
     await orderRef.add({
       'userId': userId,
       'items': items,
       'total': total,
       'createdAt':
           FieldValue.serverTimestamp(), // dùng để quản lý thời gian tạo đơn hàng
+      if (customerInfo != null) 'customerInfo': customerInfo,
     });
   }
 

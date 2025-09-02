@@ -85,7 +85,7 @@ class ProductDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    ' ${product.price}',
+                    ' ${product.price} Đ',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -119,10 +119,20 @@ class ProductDetailScreen extends StatelessWidget {
 
           // thêm vào giỏ hàng
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: ElevatedButton.icon(
               icon: const Icon(Icons.add_shopping_cart, color: Colors.white),
-              label: const Text('Thêm vào giỏ hàng'),
+              label: const Text(
+                'Thêm vào giỏ hàng',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 1, 20, 49),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
               onPressed: userId == null
                   ? null
                   : () async {

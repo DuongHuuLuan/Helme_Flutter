@@ -6,6 +6,7 @@ import 'package:app_flutter/services/order_services.dart';
 import 'cart_detail_screen.dart';
 import 'package:app_flutter/core/widgets/app_bar.dart';
 import 'cart_item.dart';
+import 'package:app_flutter/screens/payment/payment_confirm.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -109,15 +110,23 @@ class _CartScreenState extends State<CartScreen> {
             return CircularProgressIndicator();
           }
           final cartItems = snapshot.data!;
+
+          final _selectedProducts = cartItems
+              .where((item) => _selectedItems.contains(item['id']))
+              .toList();
           print('Snapshot has data. Number of items: ${cartItems.length}');
           print('Data: $cartItems');
 
           if (cartItems.isEmpty) {
             return const Center(child: Text('Giỏ hàng trống'));
           }
-          final total = cartItems.fold<double>(0, (sum, item) {
-            return sum + (item['price'] * item['quantity']);
-          });
+          final total = cartItems
+              .where((element) => _selectedItems.contains(element['id']))
+              .fold<double>(0, (sum, item) {
+                return sum + (item['price'] * item['quantity']);
+              });
+          // }
+          // );
           return Column(
             children: [
               Expanded(
@@ -142,65 +151,57 @@ class _CartScreenState extends State<CartScreen> {
 
               Container(
                 padding: const EdgeInsets.all(16),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    _onPayment(cartItems);
-                  },
-                  icon: Icon(Icons.payment, color: Colors.white),
-                  label: Text(
-                    'Thanh toán ${_selectedItems.length} Sản phẩm',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                  ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Tổng tiền: ${total}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        // _onPayment(cartItems);
+                        if (_selectedProducts.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Vui lòng chọn ít nhất 1 sản phẩm để thanh toán!',
+                              ),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return PaymentConfirm(
+                                  items: _selectedProducts,
+                                  total: total,
+                                );
+                              },
+                            ),
+                          );
+                        }
+                      },
+                      icon: Icon(Icons.payment, color: Colors.white),
+                      label: Text(
+                        'Thanh toán ${_selectedItems.length} Sản phẩm',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 1, 20, 49),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              // Container(
-              //   padding: const EdgeInsets.all(16),
-              //   decoration: BoxDecoration(),
-              //   child: Column(
-              //     children: [
-              //       Text(
-              //         'Tổng tiền: ${total} VNĐ',
-              //         style: TextStyle(
-              //           fontWeight: FontWeight.bold,
-              //           fontSize: 18,
-              //         ),
-              //       ),
-
-              //       ElevatedButton(
-              //         onPressed: () async {
-              //           try {
-              //             await orderServices.createOrder(
-              //               userId,
-              //               cartItems,
-              //               total,
-              //             );
-              //             await cartServices.clearCart(userId);
-
-              //             ScaffoldMessenger.of(context).showSnackBar(
-              //               const SnackBar(
-              //                 content: Text('Thanh toán thành công'),
-              //               ),
-              //             );
-              //           } catch (e) {
-              //             ScaffoldMessenger.of(
-              //               context,
-              //             ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
-              //           }
-              //         },
-              //         child: const Text(
-              //           'Thanh toán tất cả',
-              //           style: TextStyle(
-              //             fontSize: 16,
-              //             fontWeight: FontWeight.bold,
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
             ],
           );
         },

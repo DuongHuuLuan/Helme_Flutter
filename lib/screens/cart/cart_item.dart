@@ -100,19 +100,19 @@ class _CartItemState extends State<CartItem> {
             ),
           ],
         ),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return CartDetailScreen(
-                  item: widget.item,
-                  userId: widget.userId,
-                );
-              },
-            ),
-          );
-        },
+        // onTap: () {
+        //   Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //       builder: (context) {
+        //         return CartDetailScreen(
+        //           item: widget.item,
+        //           userId: widget.userId,
+        //         );
+        //       },
+        //     ),
+        //   );
+        // },
       ),
     );
   }
