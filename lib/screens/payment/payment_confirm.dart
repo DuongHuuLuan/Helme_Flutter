@@ -72,6 +72,12 @@ class _PaymentConfirmState extends State<PaymentConfirm> {
       appBar: CustomAppBar(
         title: 'Xác nhận thanh toán',
         titleTextStyle: TextStyle(fontWeight: FontWeight.bold),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+        ),
       ),
 
       body: SingleChildScrollView(

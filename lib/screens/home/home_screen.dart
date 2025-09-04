@@ -12,6 +12,7 @@ import 'package:app_flutter/models/product_model.dart';
 import 'package:app_flutter/screens/product/product_card.dart';
 import 'package:app_flutter/screens/product/search_Screen.dart';
 import 'package:app_flutter/core/widgets/app_bar.dart';
+import 'home_content.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
   // danh sách các màn hình
   static final List<Widget> _widgetOptions = <Widget>[
-    HomePageContent(),
+    HomeContent(),
     ProductListScreen(),
     OrderHistoryScreen(),
     ProfileScreen(),
@@ -57,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .instance
         .currentUser; // truy cập vào firebaseAuht lấy thông tin người dùng hiện tại
     final authServices = AuthServices();
+    bool isHomeScreen = _selectedIndex == 0;
     return Scaffold(
       appBar: CustomAppBar(
         title: _appBarTitles[_selectedIndex],
@@ -64,6 +66,14 @@ class _HomeScreenState extends State<HomeScreen> {
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
+        leading: isHomeScreen
+            ? null
+            : IconButton(
+                onPressed: () {
+                  _onTapAppBar(0);
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
         actions: [
           IconButton(
             onPressed: () {
@@ -93,13 +103,76 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.search, color: Colors.white),
             tooltip: 'Tìm kiếm',
           ),
-
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.menu, color: Colors.white),
-            tooltip: 'Menu',
+          Builder(
+            builder: (context) {
+              return IconButton(
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                icon: Icon(Icons.menu),
+              );
+            },
           ),
         ],
+      ),
+      drawer: Drawer(
+        // backgroundColor: const Color.fromARGB(255, 1, 20, 49),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 1, 20, 49),
+              ),
+              child: Column(
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    "Menu",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              title: Text(
+                'Về Chúng Tôi',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              onTap: () {}, // điều hướng đến trang về chúng tôi
+            ),
+            // const SizedBox(height: 10),
+            ListTile(
+              title: const Text(
+                'Sản Phẩm',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _onTapAppBar(1);
+              },
+            ),
+          ],
+        ),
       ),
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
@@ -120,60 +193,6 @@ class _HomeScreenState extends State<HomeScreen> {
         unselectedItemColor: Colors.grey,
         onTap: _onTap,
       ),
-    );
-  }
-}
-
-class HomePageContent extends StatelessWidget {
-  final authServices = AuthServices();
-  final productServices = ProductServices();
-  final userId = FirebaseAuth.instance.currentUser!;
-  HomePageContent({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<List<Product>>(
-      stream: productServices.getProducts(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final products = snapshot.data!;
-
-        final Map<String, List<Product>> groupProducts = {};
-        for (var product in products) {
-          if (!groupProducts.containsKey(product.style)) {
-            groupProducts[product.style] = [];
-          }
-          groupProducts[product.style]!.add(product);
-        }
-
-        final intStyles = groupProducts.keys.toList();
-        return ListView.builder(
-          itemCount: intStyles.length,
-          itemBuilder: (context, index) {
-            final type = intStyles[index];
-            final productsOfStyle = groupProducts[type]!;
-            final firstStyleProducts = productsOfStyle.first;
-
-            return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                  ),
-                  ProductCard(product: firstStyleProducts),
-                ],
-              ),
-            );
-          },
-        );
-      },
     );
   }
 }

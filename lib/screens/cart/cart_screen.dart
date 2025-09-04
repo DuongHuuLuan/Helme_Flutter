@@ -101,6 +101,12 @@ class _CartScreenState extends State<CartScreen> {
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+        ),
       ),
 
       body: StreamBuilder<List<Map<String, dynamic>>>(

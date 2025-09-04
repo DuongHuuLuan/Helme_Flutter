@@ -1,3 +1,4 @@
+import 'package:app_flutter/screens/cart/cart_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:app_flutter/models/product_model.dart';
@@ -20,6 +21,21 @@ class ProductDetailScreen extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 1, 20, 49),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return CartScreen();
+                  },
+                ),
+              );
+            },
+            icon: Icon(Icons.shopping_cart, color: Colors.white),
+          ),
+        ],
       ),
       body: Column(
         children: [
