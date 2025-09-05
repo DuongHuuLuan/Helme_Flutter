@@ -5,6 +5,8 @@ class Product {
   final double price;
   final String style;
   final String imageUrl;
+  final String name_lower;
+  final List<String> sizes;
 
   Product({
     required this.id,
@@ -13,6 +15,8 @@ class Product {
     required this.price,
     required this.style,
     required this.imageUrl,
+    required this.name_lower,
+    required this.sizes,
   });
 
   // chinh sua du lieu lay tu firestore
@@ -20,10 +24,12 @@ class Product {
     return Product(
       id: documentId,
       name: data['name'] ?? '',
+      name_lower: data['name_lower'] ?? '',
       description: data['description'] ?? '',
       price: (data['price'] ?? 0).toDouble(),
       style: data['style'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
+      sizes: List<String>.from(data['sizes'] ?? []),
     );
   }
 
@@ -31,10 +37,12 @@ class Product {
   Map<String, dynamic> toMap() {
     return {
       'name': name,
+      'name_lower': name_lower,
       'description': description,
       'price': price,
       'style': style,
       'imageUrl': imageUrl,
+      'sizes': sizes,
     };
   }
 }

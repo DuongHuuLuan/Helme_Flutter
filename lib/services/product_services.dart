@@ -8,6 +8,9 @@ class ProductServices {
 
   Stream<List<Product>> getProducts() {
     return _db.collection('products').snapshots().map((snapshot) {
+      for (var doc in snapshot.docs) {
+        print(doc.data());
+      }
       return snapshot.docs
           .map((doc) => Product.formMap(doc.data(), doc.id))
           .toList();
