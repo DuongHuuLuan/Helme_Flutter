@@ -11,7 +11,16 @@ class OrderDetailHistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = List<Map<String, dynamic>>.from(order['items']);
     final total = order['total'];
-    final createdAt = (order['createdAt'] as Timestamp?)?.toDate();
+    final createdAt = (order['createdAt'] is Timestamp
+        ? (order['createdAt'] as Timestamp).toDate()
+        : order['createdAt'] as DateTime?);
+    final orderId = order['id'] ?? 'N/A';
+    final status = order['status'] ?? 'Chưa xác định';
+    final custommerInfo = order['customerInfo'] ?? {};
+    final shipping = order['shipping'] ?? 0;
+    final paymentMethod = order['paymentMethod'] ?? 'COD';
+    final paymentStatus = order['paymentStatus'] ?? 'Chưa rõ';
+    final notes = order['notes'] ?? '';
 
     return Scaffold(
       appBar: AppBar(title: Text('Chi tiết đơn hàng')),
@@ -20,10 +29,29 @@ class OrderDetailHistoryScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // thông tin đơnhàng
+            Text(
+              'Mã đơn hàng: $orderId',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             Text('Ngày đặt: ${createdAt ?? 'N/A'} '),
-            Text('Tổng Tiền: $total VNĐ'),
+            // Text('Tổng Tiền: $total Đ'),
+            Text('Trạng thái: $status'),
+            // thông tin khách hàng
+            const SizedBox(height: 10),
+            const Text(
+              'Thông tin khách hàng:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text('Tên: ${custommerInfo['name'] ?? 'N/A'}'),
+            Text('SĐt: ${custommerInfo['phone'] ?? 'N/A'}'),
+            Text('Email: ${custommerInfo['email'] ?? 'N/A'}'),
+            Text('Địa chỉ: ${custommerInfo['address'] ?? 'N/A'}'),
             const SizedBox(height: 15),
-            Text('Danh sách sản phẩm:'),
+            Text(
+              'Danh sách sản phẩm:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             Expanded(
               child: ListView.separated(
                 itemBuilder: (context, index) {
@@ -31,12 +59,29 @@ class OrderDetailHistoryScreen extends StatelessWidget {
                   return ListTile(
                     title: Text(item['name']),
                     subtitle: Text(
-                      'Giá: ${item['pỉce']} VNĐ x ${item['quantity']}',
+                      'Giá: ${item['price']} VNĐ x ${item['quantity']}',
+                    ),
+                    trailing: Text(
+                      'Tổng: $total Đ',
+                      style: TextStyle(color: Colors.red),
                     ),
                   );
                 },
                 separatorBuilder: (context, index) => const Divider(),
                 itemCount: items.length,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text('Phương thức thanh toán: $paymentMethod'),
+            Text('Trạng thái: $paymentStatus'),
+            Text('Ghi chú: ${custommerInfo['notes']}'),
+            const Divider(),
+            Text(
+              'Tổng cộng: ${total + shipping} Đ',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
               ),
             ),
           ],

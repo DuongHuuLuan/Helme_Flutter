@@ -17,6 +17,7 @@ class CartServices {
     } else {
       await cartRef.doc(product.id).set({
         'name': product.name,
+        'style': product.style,
         'price': product.price,
         'description': product.description,
         'imageUrl': product.imageUrl,
@@ -40,6 +41,7 @@ class CartServices {
 
             final data = doc.data();
             itemData['name'] = data['name'];
+            itemData['style'] = data['style'];
             itemData['price'] = data['price'];
             itemData['quantity'] = data['quantity'];
             itemData['imageUrl'] = data['imageUrl'];

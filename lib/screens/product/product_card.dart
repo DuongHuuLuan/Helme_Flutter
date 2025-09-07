@@ -195,6 +195,7 @@ class ProductStyleCard extends StatelessWidget {
         );
       },
       child: Container(
+        width: 230,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 255, 255, 255),
           borderRadius: BorderRadius.circular(10),
@@ -223,15 +224,18 @@ class ProductStyleCard extends StatelessWidget {
               ),
             ),
             // hiển thị size nón
-            Text(
-              product.name,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Text(
+                product.name,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
             Text(
               '${product.price} đ',

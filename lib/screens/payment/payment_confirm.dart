@@ -18,11 +18,13 @@ class _PaymentConfirmState extends State<PaymentConfirm> {
   final cartServices = CartServices();
   final userId = FirebaseAuth.instance.currentUser!.uid;
   bool isSelected = false;
+  String _selectedPaymentMethod = 'COD';
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _addressController = TextEditingController();
+  final _notesController = TextEditingController();
 
   @override
   void dispose() {
@@ -30,11 +32,20 @@ class _PaymentConfirmState extends State<PaymentConfirm> {
     _phoneController.dispose();
     _emailController.dispose();
     _addressController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
   void _onPayment() async {
-    if (_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate()) return;
+    if (!isSelected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng đòng ý với điều khoản')),
+      );
+      return;
+    }
+
+    {
       try {
         await orderServices.createOrder(
           userId,
@@ -45,7 +56,9 @@ class _PaymentConfirmState extends State<PaymentConfirm> {
             'phone': _phoneController.text,
             'email': _emailController.text,
             'address': _addressController.text,
+            'notes': _notesController.text,
           },
+          paymentMethod: _selectedPaymentMethod,
         );
 
         for (var item in widget.items) {
@@ -132,11 +145,12 @@ class _PaymentConfirmState extends State<PaymentConfirm> {
 
               const SizedBox(height: 20),
               Text(
-                'THÔN TIN BỔ SUNG',
+                'THÔNG TIN BỔ SUNG',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               TextFormField(
+                controller: _notesController,
                 decoration: const InputDecoration(
                   labelText: 'Ghi chú đơn hàng (tùy chọn)',
                   border: OutlineInputBorder(),
@@ -213,24 +227,59 @@ class _PaymentConfirmState extends State<PaymentConfirm> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Trả tiền mặt khi nhận hàng',
+                      'PHƯƠNG THỨC THANH TOÁN',
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    const SizedBox(height: 10),
+                    Column(
+                      children: [
+                        RadioListTile<String>(
+                          title: Text('Trả tiền mặt khi nhận hàng (COD)'),
+                          value: 'Thanh toán khi nhận hàng',
+                          groupValue: _selectedPaymentMethod,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedPaymentMethod = value!;
+                            });
+                          },
+                        ),
+                        RadioListTile<String>(
+                          title: Text('Chuyển khoản ngân hàng'),
+                          value: 'Thanh toán bằng tài khoản ngân hàng.',
+                          groupValue: _selectedPaymentMethod,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedPaymentMethod = value!;
+                            });
+                          },
+                        ),
+                        RadioListTile<String>(
+                          title: Text('Ví điện tử (Momo, ZaloPay,...)'),
+                          value: 'Thanh toán ví điện tử.',
+                          groupValue: _selectedPaymentMethod,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedPaymentMethod = value!;
+                            });
+                          },
+                        ),
+                      ],
                     ),
 
-                    Text(
-                      'Trả tiền mặt khi nhận hàng',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w300,
-                      ),
-                    ),
                     const SizedBox(height: 20),
                     Row(
                       children: [
-                        Checkbox(value: isSelected, onChanged: (value) {}),
+                        Checkbox(
+                          value: isSelected,
+                          onChanged: (value) {
+                            setState(() {
+                              isSelected = value ?? false;
+                            });
+                          },
+                        ),
                         Flexible(
                           child: Text(
                             "tôi đã đọc và đồng ý với điều khoản và điều kiện của ứng dụng",
