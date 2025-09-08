@@ -1,16 +1,31 @@
+class SizeStock {
+  final String size;
+  final int stock;
+
+  SizeStock({required this.size, required this.stock});
+
+  factory SizeStock.fromMap(Map<String, dynamic> data) {
+    return SizeStock(size: data['size'] ?? '', stock: data['stock']);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {'size': size, 'stock': stock};
+  }
+}
+
 class ProducvariantModel {
   final String id;
-  final String productId;
-  final String size;
+  // final String productId;
+  final String imageUrl;
+  final List<SizeStock> sizes;
   final String color;
-  final int stock;
 
   ProducvariantModel({
     required this.id,
-    required this.productId,
-    required this.size,
+    // required this.productId,
+    required this.imageUrl,
+    required this.sizes,
     required this.color,
-    required this.stock,
   });
 
   // lấy dữ liệu từ firestore
@@ -20,19 +35,21 @@ class ProducvariantModel {
   ) {
     return ProducvariantModel(
       id: documentId,
-      productId: data['productId'] ?? '',
-      size: data['size'] ?? '',
+      // productId: data['productId'] ?? '',
+      imageUrl: data['imageUrl'] ?? '',
+      sizes: (data['sizes'] as List<dynamic>? ?? [])
+          .map((e) => SizeStock.fromMap(e as Map<String, dynamic>))
+          .toList(),
       color: data['color'] ?? '',
-      stock: data['stock'] ?? 0,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'productId': productId,
-      'size': size,
+      // 'productId': productId,
+      'imageUrl': imageUrl,
+      'sizes': sizes.map((e) => e.toMap()).toList(),
       'color': color,
-      'stock': stock,
     };
   }
 }

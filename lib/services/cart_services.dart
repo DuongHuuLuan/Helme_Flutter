@@ -26,6 +26,34 @@ class CartServices {
     }
   }
 
+  // Future<void> addToCart(
+  //   String userId,
+  //   Product product, {
+  //   required String variantId,
+  //   required String color,
+  //   required String size,
+  //   required String imageUrl,
+  // }) async {
+  //   final cartRef = FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(userId)
+  //       .collection('cart')
+  //       .doc(variantId); //mỗi variantId là duy nhất trong giỏ hàng
+
+  //   await cartRef.set({
+  //     'productId': product.id,
+  //     'name': product.name,
+  //     'price': product.price,
+  //     'color': color,
+  //     'size': size,
+  //     'imageUrl': imageUrl,
+  //     'quantity': FieldValue.increment(1), //tự động +1 nếu đã tồn tại
+  //     'createdAt': FieldValue.serverTimestamp(),
+  //   }, SetOptions(merge: true));
+
+  //   print(" thêm $variantId  vào giỏ hàng của $userId");
+  // }
+
   // lấy sản phẩm từ giỏ hàng
   Stream<List<Map<String, dynamic>>> getCart(String userId) {
     return _db
