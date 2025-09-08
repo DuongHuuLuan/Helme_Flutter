@@ -6,7 +6,6 @@ class Product {
   final String style;
   final String imageUrl;
   final String name_lower;
-  final List<String> sizes;
 
   Product({
     required this.id,
@@ -16,7 +15,6 @@ class Product {
     required this.style,
     required this.imageUrl,
     required this.name_lower,
-    required this.sizes,
   });
 
   // chinh sua du lieu lay tu firestore
@@ -29,7 +27,6 @@ class Product {
       price: (data['price'] ?? 0).toDouble(),
       style: data['style'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
-      sizes: List<String>.from(data['sizes'] ?? []),
     );
   }
 
@@ -42,7 +39,6 @@ class Product {
       'price': price,
       'style': style,
       'imageUrl': imageUrl,
-      'sizes': sizes,
     };
   }
 }

@@ -152,11 +152,6 @@ class OrderHistoryScreen extends StatelessWidget {
                                                 imageUrl: item['imageUrl'],
                                                 name_lower:
                                                     item['name_lower'] ?? '',
-                                                sizes: item['sizes'] is List
-                                                    ? List<String>.from(
-                                                        item['sizes'],
-                                                      )
-                                                    : [item['sizes'] ?? ''],
                                               );
 
                                               Navigator.push(
